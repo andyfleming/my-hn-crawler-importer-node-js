@@ -1,5 +1,3 @@
-const axios = require('axios')
-const _ = require('lodash')
 const createConnection = require('./db/create-connection')
 const createTables = require('./db/create-tables')
 const importTopStories = require('./importing/import-top-stories')
