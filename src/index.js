@@ -14,7 +14,7 @@ async function main() {
 
     // Default mode: Import Top Stories
     // TODO: consider a switch based on cli flags or similar
-    await importTopStories()
+    await importTopStories(conn)
 
     // Close the connection
     conn.end()
