@@ -19,6 +19,7 @@ async function main() {
     // Close the connection
     conn.end()
 
+    console.log('Importing complete.')
 }
 
 main()
