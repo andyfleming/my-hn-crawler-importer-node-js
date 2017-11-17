@@ -57,7 +57,7 @@ module.exports = async function runJobs(jobs, work) {
             // Call the provided work function and capture the promise it returns
             // We'll capture the promise that work() returns
             // We also pass it an "addJob" function to allow it to queue additional jobs, if needed
-            console.log('Working next job')
+            //console.log('Working next job')
             jobPromises.push(work(job, addJob))
 
             // If jobs are (supposedly) all complete, wait 1 second to allow for new job additions to complete
@@ -66,9 +66,11 @@ module.exports = async function runJobs(jobs, work) {
             }
         }
 
+        console.log('Started all remaining jobs. Waiting for them to finish...')
+
         // Wait to ensure all jobs have completed, then resolve
         Promise.all(jobPromises).then(() => {
-            
+
             // Also, before we resolve, we want to clean up any outstanding timers we have
             decrementTimers.forEach(t => clearTimeout(t))
             
