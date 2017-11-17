@@ -60,6 +60,10 @@ module.exports = async function runJobs(jobs, work) {
             console.log('Working next job')
             jobPromises.push(work(job, addJob))
 
+            // If jobs are (supposedly) all complete, wait 1 second to allow for new job additions to complete
+            if (remainingJobs.length === 0) {
+                await wait(1000)                
+            }
         }
 
         // Wait to ensure all jobs have completed, then resolve
