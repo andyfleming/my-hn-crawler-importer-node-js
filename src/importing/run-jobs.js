@@ -5,8 +5,8 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 const now = () => (new Date).getTime()
 
 // Settings for crawl-rate
-const MAX_JOBS_PER_PERIOD = parseInt(process.env.MAX_JOBS_PER_PERIOD || 100)
-const PERIOD_LENGTH_SECONDS = parseInt(process.env.PERIOD_LENGTH_SECONDS || 10)
+const MAX_JOBS_PER_PERIOD = parseInt(process.env.MAX_JOBS_PER_PERIOD || 250)
+const PERIOD_LENGTH_SECONDS = parseInt(process.env.PERIOD_LENGTH_SECONDS || 5)
 
 module.exports = async function runJobs(jobs, work) {
 
