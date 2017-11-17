@@ -5,5 +5,5 @@
 Currently this is intended to run locally with Node v9+.
 
 ```
-node src/index.js
+node src/run-crawler-importer.js
 ```
