@@ -1,5 +1,5 @@
 // Resolve a Promise in X ms
-const wait = ms => new Promise((resolve) => setTimeout(resolve, ms))
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 // Get the current time in milliseconds
 const now = () => (new Date).getTime()
