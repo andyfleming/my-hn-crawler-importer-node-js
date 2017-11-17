@@ -6,13 +6,9 @@ const workJob = require('./work-job')
 module.exports = async function importTopStories(conn) {
     const topStories = await api.get(`/topstories.json`)
     const topStoryIds = topStories.data
-
-    console.log('topStoryIds', topStoryIds)
-
-    const firstIds = topStoryIds.slice(0,5)
     
     // Format the jobs
-    const jobs = firstIds.map(id => {
+    const jobs = topStoryIds.map(id => {
         return {
             type: 'import-story',
             data: {
