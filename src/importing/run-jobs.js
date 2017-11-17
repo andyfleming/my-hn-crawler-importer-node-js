@@ -12,43 +12,44 @@ module.exports = async function runJobs(jobs, work) {
 
     // Clone the array
     let remainingJobs = [...jobs]
-    
+
+    // We'll also create a function for adding a job
+    const addJob = job => {
+        remainingJobs.push(job)
+    }
+
     // Create an array to store promises
     // We'll use this after all jobs have been started to ensure all are completed before we resolve as complete
     let jobPromises = []
 
-    // We'll also create a function for adding a job
-    const addJob = job => { remainingJobs.push(job) }
-
     // We'll keep track of how many jobs have been started since we started this period
-    let startOfPeriod = now()
-    let numJobsInPeriod = 0
+    let numJobsInCurrentPeriod = 0
+
+    // We'll also keep track of our timeouts we set for decrementing the num of jobs started this period
+    let decrementTimers = []
 
     return new Promise(async resolve => {
         
         // Run our working loop
         while (remainingJobs.length > 0) {
-        
-            // Reset our job count and timer if we are in a new period
-            if (now() - startOfPeriod > PERIOD_LENGTH_SECONDS * 1000) {
-                startOfPeriod = now()
-                numJobsInPeriod = 0
-            }
 
-            // If we've hit our max number of jobs already, set a (non-blocking) timer to delay our execution until the period is over
-            if (numJobsInPeriod === MAX_JOBS_PER_PERIOD) {
-                
-                // Calculate the end of this period. We'll "wait" until the end of the period to continue
-                const endOfPeriod = startOfPeriod + (PERIOD_LENGTH_SECONDS * 1000)
-                const msUntilEndOfPeriod = Math.max(endOfPeriod - now() ,0)
-
-                console.log('Hit max of ' + MAX_JOBS_PER_PERIOD + ' per ' + PERIOD_LENGTH_SECONDS + ' seconds. Waiting ' + msUntilEndOfPeriod + ' milliseconds before continuing.')
-
-                await wait(msUntilEndOfPeriod)
+            // If we've hit our max number of jobs already, set a (non-blocking) timer to delay our execution 500ms
+            // Then we'll restart our loop
+            if (numJobsInCurrentPeriod >= MAX_JOBS_PER_PERIOD) {
+                console.log('At max jobs allowed for this period. Sleeping 500ms...')
+                await wait(500)
+                continue
             }
 
             // Increment our jobs in this period since we are about to start another
-            numJobsInPeriod++
+            numJobsInCurrentPeriod++
+
+            // Set a timer to decrement after it is our of range of the period length
+            const clearDecrementTimer = setTimeout(() => {
+                numJobsInCurrentPeriod--
+            }, PERIOD_LENGTH_SECONDS * 1000)
+
+            decrementTimers.push(clearDecrementTimer)
 
             // Grab the first job off the queue (and remove it from the queue)
             const job = remainingJobs.shift()
@@ -62,6 +63,12 @@ module.exports = async function runJobs(jobs, work) {
         }
 
         // Wait to ensure all jobs have completed, then resolve
-        Promise.all(jobPromises).then(resolve)
+        Promise.all(jobPromises).then(() => {
+            
+            // Also, before we resolve, we want to clean up any outstanding timers we have
+            decrementTimers.forEach(t => clearTimeout(t))
+            
+            resolve()
+        })
     })
 }
